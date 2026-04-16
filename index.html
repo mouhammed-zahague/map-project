@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌿 Green Campus Alert Map - ENSEREDD</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<!-- ══════════ LOADING SCREEN ══════════ -->
+<div id="loading-screen" class="loading-screen">
+    <div class="loader">
+        <i class="fa-solid fa-leaf fa-spin"></i>
+        <h2>Green Campus Alert Map</h2>
+        <p>ENSEREDD - Batna</p>
+    </div>
+</div>
+
+<!-- ══════════ AUTH MODAL ══════════ -->
+<div id="auth-modal" class="modal" style="display:none;">
+    <div class="modal-content auth-modal-content">
+        <div class="auth-header">
+            <i class="fa-solid fa-leaf"></i>
+            <h2>Green Campus Alert</h2>
+            <p>المدرسة الوطنية العليا للطاقات المتجددة - باتنة</p>
+        </div>
+
+        <div class="auth-tabs">
+            <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+            <button class="auth-tab" onclick="showAuthTab('register')">Register</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> Username or Email</label>
+                <input type="text" id="login-username" required placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="login-password" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fa-solid fa-sign-in-alt"></i> Login
+            </button>
+            <p class="auth-hint">Demo: admin / admin123 | student1 / student123</p>
+        </form>
+
+        <!-- Register Form -->
+        <form id="register-form" class="auth-form" style="display:none;" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label><i class="fa-solid fa-user"></i> Username</label>
+                <input type="text" id="reg-username" required placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-envelope"></i> Email</label>
+                <input type="email" id="reg-email" required placeholder="your.email@enseredd.dz">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-id-card"></i> Full Name</label>
+                <input type="text" id="reg-fullname" placeholder="Your full name">
+            </div>
+            <div class="form-group">
+                <label><i class="fa-solid fa-lock"></i> Password</label>
+                <input type="password" id="reg-password" required minlength="6" placeholder="Min 6 characters">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fa-solid fa-user-plus"></i> Register
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div id="main-app" style="display:none;">
+
+    <!-- ──── SIDEBAR ──── -->
+    <aside id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fa-solid fa-leaf"></i>
+                <div>
+                    <h3>GreenCampus</h3>
+                    <small>ENSEREDD Batna</small>
+                </div>
+            </div>
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" onclick="showPage('map')">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Map</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('alerts')">
+                <i class="fa-solid fa-bell"></i>
+                <span>Alerts</span>
+                <span id="alert-badge" class="badge">0</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('dashboard')">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" onclick="showPage('submit')">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>New Alert</span>
+            </a>
+            <a href="#" class="nav-item" id="nav-admin" style="display:none;" onclick="showPage('admin')">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Admin</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user-circle"></i>
+                </div>
+                <div class="user-details">
+                    <span id="user-display-name">User</span>
+                    <small id="user-role-badge" class="role-badge">student</small>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline" onclick="logout()">
+                <i class="fa-solid fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ──── MAIN CONTENT ──── -->
+    <main id="main-content" class="main-content">
+
+        <!-- ═══ MAP PAGE ═══ -->
+        <div id="page-map" class="page active">
+            <div class="map-header">
+                <h2><i class="fa-solid fa-map-location-dot"></i> Campus Alert Map</h2>
+                <div class="map-filters">
+                    <select id="filter-category" onchange="applyMapFilters()">
+                        <option value="">All Categories</option>
+                    </select>
+                    <select id="filter-status" onchange="applyMapFilters()">
+                        <option value="">All Statuses</option>
+                        <option value="reported">🔴 Reported</option>
+                        <option value="validated">🟡 Validated</option>
+                        <option value="in_progress">🟠 In Progress</option>
+                        <option value="resolved">🟢 Resolved</option>
+                    </select>
+                    <select id="filter-priority" onchange="applyMapFilters()">
+                        <option value="">All Priorities</option>
+                        <option value="critical">🔴 Critical</option>
+                        <option value="high">🟠 High</option>
+                        <option value="medium">🟡 Medium</option>
+                        <option value="low">🟢 Low</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline" onclick="resetFilters()">
+                        <i class="fa-solid fa-rotate-right"></i> Reset
+                    </button>
+                </div>
+            </div>
+            <div id="map" class="map-container"></div>
+            <div class="map-legend">
+                <h4>Legend</h4>
+                <div class="legend-items">
+                    <span><i class="fa-solid fa-droplet" style="color:#0077be"></i> Water Leak</span>
+                    <span><i class="fa-solid fa-bolt" style="color:#f39c12"></i> Energy Waste</span>
+                    <span><i class="fa-solid fa-trash" style="color:#e74c3c"></i> Waste</span>
+                    <span><i class="fa-solid fa-smog" style="color:#8e44ad"></i> Pollution</span>
+                    <span><i class="fa-solid fa-tree" style="color:#27ae60"></i> Green Space</span>
+                    <span><i class="fa-solid fa-building" style="color:#95a5a6"></i> Infrastructure</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ ALERTS LIST PAGE ═══ -->
+        <div id="page-alerts" class="page">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-bell"></i> All Alerts</h2>
+                <div class="page-actions">
+                    <input type="text" id="search-alerts" placeholder="Search alerts..."
+                           onkeyup="searchAlerts(this.value)">
+                    <button class="btn btn-primary" onclick="showPage('submit')">
+                        <i class="fa-solid fa-plus"></i> New Alert
+                    </button>
+                </div>
+            </div>
+            <div id="alerts-list" class="alerts-grid"></div>
+        </div>
+
+        <!-- ═══ DASHBOARD PAGE ═══ -->
+        <div id="page-dashboard" class="page">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-chart-line"></i> Dashboard</h2>
+            </div>
+
+            <div class="stats-cards">
+                <div class="stat-card stat-total">
+                    <div class="stat-icon"><i class="fa-solid fa-bell"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-total">0</h3>
+                        <p>Total Alerts</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-active">
+                    <div class="stat-icon"><i class="fa-solid fa-exclamation-triangle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-active">0</h3>
+                        <p>Active</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-resolved">
+                    <div class="stat-icon"><i class="fa-solid fa-check-circle"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-resolved">0</h3>
+                        <p>Resolved</p>
+                    </div>
+                </div>
+                <div class="stat-card stat-rate">
+                    <div class="stat-icon"><i class="fa-solid fa-percentage"></i></div>
+                    <div class="stat-info">
+                        <h3 id="stat-rate">0%</h3>
+                        <p>Resolution Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-pie"></i> Alerts by Category</h3>
+                    <canvas id="chart-categories"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-bar"></i> Alerts by Status</h3>
+                    <canvas id="chart-status"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-area"></i> Alerts Timeline (30 days)</h3>
+                    <canvas id="chart-timeline"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-bar"></i> Alerts by Priority</h3>
+                    <canvas id="chart-priority"></canvas>
+                </div>
+            </div>
+
+            <div class="dashboard-bottom">
+                <div class="recent-section">
+                    <h3><i class="fa-solid fa-clock"></i> Recent Alerts</h3>
+                    <div id="recent-alerts-list"></div>
+                </div>
+                <div class="top-section">
+                    <h3><i class="fa-solid fa-trophy"></i> Top Reporters</h3>
+                    <div id="top-reporters-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══ SUBMIT ALERT PAGE ═══ -->
+        <div id="page-submit" class="page">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-plus-circle"></i> Submit New Alert</h2>
+            </div>
+
+            <div class="submit-layout">
+                <form id="alert-form" class="alert-form" onsubmit="submitAlert(event)">
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-heading"></i> Title *</label>
+                        <input type="text" id="alert-title" required
+                               placeholder="Brief description of the issue">
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-align-left"></i> Description *</label>
+                        <textarea id="alert-description" required rows="4"
+                                  placeholder="Detailed description of the environmental issue..."
+                                  oninput="analyzeText()"></textarea>
+                        <div id="ml-prediction" class="ml-prediction" style="display:none;">
+                            <strong><i class="fa-solid fa-robot"></i> AI Analysis:</strong>
+                            <span id="ml-prediction-text"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-tag"></i> Category *</label>
+                            <select id="alert-category" required>
+                                <option value="">Select category</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-location-dot"></i> Zone</label>
+                            <select id="alert-zone">
+                                <option value="">Select zone (optional)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-map-pin"></i> Location *
+                            <small>(Click on the map to set location)</small>
+                        </label>
+                        <div id="submit-map" class="submit-map"></div>
+                        <div class="coords-display">
+                            <input type="text" id="alert-lat" readonly placeholder="Latitude">
+                            <input type="text" id="alert-lng" readonly placeholder="Longitude">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-image"></i> Photo (optional)</label>
+                        <div class="file-upload">
+                            <input type="file" id="alert-image" accept="image/*"
+                                   onchange="previewImage(this)">
+                            <div class="file-upload-label">
+                                <i class="fa-solid fa-cloud-upload-alt"></i>
+                                <span>Click to upload or drag and drop</span>
+                            </div>
+                        </div>
+                        <img id="image-preview" class="image-preview" style="display:none;">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full btn-lg">
+                        <i class="fa-solid fa-paper-plane"></i> Submit Alert
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ═══ ADMIN PAGE ═══ -->
+        <div id="page-admin" class="page">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-shield-halved"></i> Admin Panel</h2>
+            </div>
+            <div id="admin-alerts" class="admin-alerts-list"></div>
+        </div>
+
+    </main>
+</div>
+
+<!-- ══════════ ALERT DETAIL MODAL ══════════ -->
+<div id="alert-detail-modal" class="modal" style="display:none;">
+    <div class="modal-content modal-lg">
+        <button class="modal-close" onclick="closeAlertDetail()">
+            <i class="fa-solid fa-times"></i>
+        </button>
+        <div id="alert-detail-content"></div>
+    </div>
+</div>
+
+<!-- ══════════ TOAST NOTIFICATION ══════════ -->
+<div id="toast-container" class="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>
