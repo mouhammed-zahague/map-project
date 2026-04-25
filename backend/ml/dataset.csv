@@ -1,0 +1,57 @@
+text,category,priority
+water is leaking from the pipe near the laboratory entrance flooding the floor,Water Leak,high
+there is a significant water leak underneath the sink in the restroom,Water Leak,high
+broken pipe causing water to flood the hallway near room 201,Water Leak,critical
+small drip from faucet in classroom bathroom,Water Leak,low
+water stains on ceiling suggesting a leak from the roof,Water Leak,medium
+lights are left on all night in the empty library reading room,Energy Waste,medium
+air conditioning running at full power in an empty lecture hall,Energy Waste,high
+computers left on overnight in the computer lab nobody is using them,Energy Waste,medium
+heating system running during summer in storage room,Energy Waste,low
+projector and lights on all weekend in conference room,Energy Waste,medium
+waste bins are overflowing near the cafeteria entrance,Waste Management,high
+garbage scattered around the parking lot nobody cleaned it,Waste Management,medium
+recycling bins are full and nobody has emptied them for days,Waste Management,medium
+illegal dumping of construction waste near the sports area,Waste Management,high
+food waste not properly disposed of near the canteen,Waste Management,medium
+strong chemical smell coming from the storage area near lab,Chemical Hazard,critical
+laboratory chemicals improperly stored near ventilation,Chemical Hazard,critical
+spilled chemicals on the floor of laboratory building,Chemical Hazard,critical
+unknown substance leaking from barrels in waste area,Chemical Hazard,high
+expired chemicals not disposed of properly in lab storage,Chemical Hazard,high
+trees in the garden are dying and need urgent attention,Green Space Damage,medium
+damaged plants near entrance due to construction work,Green Space Damage,low
+soil erosion in the garden area after heavy rain,Green Space Damage,medium
+fallen tree blocking the path near the sports field,Green Space Damage,high
+flower beds destroyed by vehicles parking on grass,Green Space Damage,medium
+sewage smell near the drainage area in parking lot,Water Pollution,high
+standing water with algae growth near the building exit,Water Pollution,medium
+dirty water flowing from drainage into garden area,Water Pollution,high
+contaminated water puddles near waste collection zone,Water Pollution,high
+oil spill in parking lot mixing with rain water,Water Pollution,medium
+smoke coming from burning waste near the back of campus,Air Pollution,high
+diesel generator running for hours causing air pollution,Air Pollution,medium
+strong odor from paint chemicals in renovation area,Air Pollution,medium
+dust cloud from construction work affecting air quality,Air Pollution,low
+exhaust fumes from vehicles parked near building entrance,Air Pollution,low
+loud construction noise during exam period,Noise Pollution,high
+generator noise disturbing students in library,Noise Pollution,medium
+loud music from event disturbing classes,Noise Pollution,low
+machinery noise from maintenance work early morning,Noise Pollution,medium
+broken infrastructure causing environmental damage near campus,Infrastructure,medium
+damaged drainage system causing water accumulation,Infrastructure,high
+broken solar panel installations wasting energy,Infrastructure,medium
+cracked walls allowing water infiltration into building,Infrastructure,medium
+non functional water fountain wasting water continuously,Infrastructure,low
+general environmental concern about campus cleanliness,Other,low
+unknown environmental issue reported near main gate,Other,low
+solar panels covered with thick dust reducing efficiency,Energy Waste,medium
+wind turbines not functioning properly,Infrastructure,medium
+campus garden irrigation system leaking water,Water Leak,medium
+chemical waste bags left outside laboratory,Chemical Hazard,high
+dead fish in campus ornamental pond,Water Pollution,high
+graffiti and damage to campus green walls,Green Space Damage,low
+broken window allowing cold air loss and energy waste,Energy Waste,low
+contaminated soil near chemical storage area,Chemical Hazard,high
+flooding in basement due to heavy rain and blocked drains,Water Leak,critical
+electrical cables exposed near garden area dangerous,Infrastructure,critical

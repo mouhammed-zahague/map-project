@@ -1,0 +1,24 @@
+{
+  "categories": [
+    "Air Pollution",
+    "Chemical Hazard",
+    "Energy Waste",
+    "Green Space Damage",
+    "Infrastructure",
+    "Noise Pollution",
+    "Other",
+    "Waste Management",
+    "Water Leak",
+    "Water Pollution"
+  ],
+  "priorities": [
+    "critical",
+    "high",
+    "low",
+    "medium"
+  ],
+  "category_accuracy": 0.4167,
+  "priority_accuracy": 0.4167,
+  "cv_mean": 0.4045,
+  "training_samples": 56
+}

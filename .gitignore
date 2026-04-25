@@ -1,0 +1,64 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Node
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Uploads and backups
+uploads/
+backups/
+
+# Build artifacts
+dist/
+build/
+.next/
+
+# Database files (keep schema and seed SQL)
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz
+*.dump
+*.bak
+
+# Environment files and secrets
+*.env
+.env.*
+*API_KEY*
+*SECRET*
+*PASSWORD*
+*DATABASE_URL*
+*SUPABASE_SERVICE_ROLE_KEY*
+
+# IDE/editor
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS files
+.DS_Store
+
+# ML models and large artifacts
+backend/ml/models/*.pkl
+backend/ml/models/*.joblib
+backend/ml/models/*.h5
+backend/ml/models/*.pt
+backend/ml/models/*.ckpt
+
+# Compiled files
+*.class
+*.jar
+

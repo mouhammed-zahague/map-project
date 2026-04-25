@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> Alert-Map – ENREDD Batna</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Leaflet.heat (CDN) -->
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://leaflet.github.io/Leaflet.heat/dist/leaflet-heat.js"></script>
+
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════════════════
+     AUTH MODAL
+══════════════════════════════════════════════════════════════ -->
+  <div id="authModal" class="modal-overlay active"
+    style="background-image:url('assets/campus.jpg');background-size:cover;background-position:center;">
+    <div class="modal-box auth-box">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i class="fas fa-leaf"></i>
+          <span>Alert-Map</span>
+        </div>
+        <p class="auth-subtitle">ENREDD – Batna, Algeria</p>
+      </div>
+
+      <div class="tab-buttons">
+        <button class="tab-btn active" data-tab="login">Login</button>
+        <button class="tab-btn" data-tab="register">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginTab" class="tab-content active">
+
+        <!-- Success banner shown after a successful sign-up -->
+        <div id="signupSuccess" class="signup-success-banner hidden">
+          <i class="fas fa-check-circle"></i>
+          <span>Your account has been created. Please check your email and verify your address before logging in.</span>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label><i class="fas fa-user"></i> Username or Email</label>
+            <input type="text" id="loginIdentifier" placeholder="Enter username or email" required />
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-lock"></i> Password</label>
+            <div class="input-with-toggle">
+              <input type="password" id="loginPassword" placeholder="Enter password" required />
+              <i class="fas fa-eye toggle-pass"></i>
+            </div>
+          </div>
+          <div class="forgot-password-link">
+            <a href="#" id="forgotPasswordLink">Forgot Password?</a>
+          </div>
+          <div id="loginError" class="form-error hidden"></div>
+          <div id="forgotSuccess" class="form-success hidden"></div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </form>
+        <div class="auth-divider">
+          <span>or</span>
+        </div>
+        <button class="btn btn-google btn-full" id="googleSignInBtn">
+          <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
+            <path
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
+              fill="#4285F4" />
+            <path
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              fill="#34A853" />
+            <path
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              fill="#FBBC05" />
+            <path
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              fill="#EA4335" />
+          </svg>
+          Sign in with Google
+        </button>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerTab" class="tab-content">
+        <form id="registerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="regFullName" placeholder="Your full name" required />
+            </div>
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="regUsername" placeholder="Choose username" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="regEmail" placeholder="your@enredd.dz" required />
+          </div>
+          <div class="form-group">
+            <label>Student ID</label>
+            <input type="text" id="regStudentId" placeholder="e.g. 20210001" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="regPassword" placeholder="Min 6 characters" required />
+          </div>
+          <div id="registerError" class="form-error hidden"></div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <i class="fas fa-user-plus"></i> Create Account
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     EMAIL VERIFICATION SCREEN
+══════════════════════════════════════════════════════════════ -->
+  <div id="verificationScreen" class="modal-overlay"
+    style="background-image:url('assets/campus.jpg');background-size:cover;background-position:center;">
+    <div class="modal-box verification-box">
+      <div class="verification-content">
+        <div class="verification-icon">
+          <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h2 class="verification-title">Check Your Email</h2>
+        <p class="verification-message">
+          We have sent you a verification email to
+          <strong id="verificationEmail">user@example.com</strong>.
+          Please verify it and log in.
+        </p>
+        <div class="verification-actions">
+          <button class="btn btn-primary btn-full" id="verificationLoginBtn">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     MAIN APP
+══════════════════════════════════════════════════════════════ -->
+  <div id="app" class="hidden">
+
+    <!-- ── NAVBAR ── -->
+    <nav class="navbar">
+      <div class="nav-brand">
+        <i class="fas fa-leaf"></i>
+        <span>GreenCampus Alert</span>
+        <span class="nav-campus">ENREDD Batna</span>
+      </div>
+      <div class="nav-menu">
+        <button class="nav-btn active" data-view="map">
+          <i class="fas fa-map-marked-alt"></i><span>Map</span>
+        </button>
+        <button class="nav-btn" data-view="alerts">
+          <i class="fas fa-bell"></i><span>Alerts</span>
+          <span class="badge" id="alertsBadge">0</span>
+        </button>
+        <button class="nav-btn" data-view="dashboard">
+          <i class="fas fa-chart-bar"></i><span>Dashboard</span>
+        </button>
+        <button class="nav-btn" id="reportBtn">
+          <i class="fas fa-plus-circle"></i><span>Report</span>
+        </button>
+      </div>
+      <div class="nav-user">
+        <div class="notification-bell">
+          <i class="fas fa-bell"></i>
+          <span class="notif-dot" id="notifDot"></span>
+        </div>
+        <div class="user-avatar" id="userAvatar">
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-info" id="userInfo">
+          <span id="userName">User</span>
+          <span class="user-role" id="userRole">student</span>
+        </div>
+        <button class="btn btn-sm btn-outline" id="logoutBtn">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ── VIEWS ── -->
+    <main class="main-content">
+
+      <!-- MAP VIEW -->
+      <section id="mapView" class="view active">
+        <div class="map-sidebar">
+          <div class="sidebar-header">
+            <h3><i class="fas fa-filter"></i> Filters</h3>
+            <button class="btn btn-sm" id="clearFilters">Clear</button>
+          </div>
+          <div class="filter-group">
+            <label>Status</label>
+            <select id="filterStatus">
+              <option value="">All Statuses</option>
+              <option value="reported">Reported</option>
+              <option value="validated">Validated</option>
+              <option value="in_progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Category</label>
+            <select id="filterCategory">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Priority</label>
+            <select id="filterPriority">
+              <option value="">All Priorities</option>
+              <option value="critical">🔴 Critical</option>
+              <option value="high">🟠 High</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-full" id="applyFilters">
+            <i class="fas fa-search"></i> Apply
+          </button>
+
+          <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item"><span class="dot dot-critical"></span>Critical</div>
+            <div class="legend-item"><span class="dot dot-high"></span>High</div>
+            <div class="legend-item"><span class="dot dot-medium"></span>Medium</div>
+            <div class="legend-item"><span class="dot dot-low"></span>Low</div>
+          </div>
+
+          <div class="map-controls">
+            <button class="btn btn-sm btn-outline" id="toggleHeatmap">
+              <i class="fas fa-fire"></i> Heatmap
+            </button>
+            <button class="btn btn-sm btn-outline" id="centerMap">
+              <i class="fas fa-crosshairs"></i> Center
+            </button>
+          </div>
+
+          <!-- Alerts mini-list -->
+          <div class="mini-list" id="miniAlertList"></div>
+        </div>
+        <div id="map"></div>
+      </section>
+
+      <!-- ALERTS VIEW -->
+      <section id="alertsView" class="view">
+        <div class="view-header">
+          <h2><i class="fas fa-bell"></i> All Alerts</h2>
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="alertSearch" placeholder="Search alerts…" />
+          </div>
+        </div>
+        <div class="alerts-toolbar">
+          <select id="alertSortBy">
+            <option value="created_at">Newest First</option>
+            <option value="priority">By Priority</option>
+            <option value="upvotes">Most Upvoted</option>
+          </select>
+          <select id="alertFilterStatus2">
+            <option value="">All Statuses</option>
+            <option value="reported">Reported</option>
+            <option value="validated">Validated</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+          </select>
+        </div>
+        <div id="alertsGrid" class="alerts-grid">
+          <div id="alertsEmptyState" class="alerts-empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-bell-slash"></i>
+            </div>
+            <h3>No Alerts Found</h3>
+            <p>There are no environmental alerts to display right now. Be the first to report an issue!</p>
+            <button class="btn btn-primary" id="emptyStateReportBtn">
+              <i class="fas fa-plus-circle"></i> Report an Issue
+            </button>
+          </div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </section>
+
+      <!-- DASHBOARD VIEW -->
+      <section id="dashboardView" class="view">
+        <div class="view-header">
+          <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+          <span class="subtitle">ENREDD Campus Environmental Overview</span>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid">
+          <div class="stat-card stat-total">
+            <div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTotal">0</span>
+              <span class="stat-label">Total Alerts</span>
+            </div>
+          </div>
+          <div class="stat-card stat-reported">
+            <div class="stat-icon"><i class="fas fa-flag"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statReported">0</span>
+              <span class="stat-label">Reported</span>
+            </div>
+          </div>
+          <div class="stat-card stat-progress">
+            <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statInProgress">0</span>
+              <span class="stat-label">In Progress</span>
+            </div>
+          </div>
+          <div class="stat-card stat-resolved">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statResolved">0</span>
+              <span class="stat-label">Resolved</span>
+            </div>
+          </div>
+          <div class="stat-card stat-critical">
+            <div class="stat-icon"><i class="fas fa-skull-crossbones"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statCritical">0</span>
+              <span class="stat-label">Critical</span>
+            </div>
+          </div>
+          <div class="stat-card stat-rate">
+            <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statRate">0%</span>
+              <span class="stat-label">Resolution Rate</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Alerts by Category</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Status Distribution</h3>
+            <canvas id="statusChart"></canvas>
+          </div>
+          <div class="chart-card chart-wide">
+            <h3>Daily Trend (Last 7 Days)</h3>
+            <canvas id="trendChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Alerts by Zone</h3>
+            <canvas id="zoneChart"></canvas>
+          </div>
+        </div>
+
+        <!-- ML Info Card -->
+        <div class="ml-info-card">
+          <div class="ml-header">
+            <i class="fas fa-robot"></i>
+            <h3>AI Classification Module</h3>
+          </div>
+          <div id="mlInfoContent" class="ml-details"></div>
+        </div>
+
+        <!-- Recent Alerts Table -->
+        <div class="recent-table-card">
+          <h3>Recent Alerts</h3>
+          <table id="recentAlertsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recentAlertsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     REPORT MODAL
+══════════════════════════════════════════════════════════════ -->
+  <div id="reportModal" class="modal-overlay">
+    <div class="modal-box report-box">
+      <div class="modal-header">
+        <h2><i class="fas fa-plus-circle"></i> Submit Environmental Alert</h2>
+        <button class="modal-close" id="closeReport">&times;</button>
+      </div>
+      <form id="reportForm" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label><i class="fas fa-heading"></i> Title *</label>
+          <input type="text" id="rTitle" placeholder="Brief title of the issue" required maxlength="200" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fas fa-tag"></i> Category *</label>
+            <select id="rCategory" required>
+              <option value="">Select category…</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label><i class="fas fa-map"></i> Campus Zone</label>
+            <select id="rZone">
+              <option value="">Select zone…</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-align-left"></i> Description *</label>
+          <textarea id="rDescription" rows="4" placeholder="Describe the environmental issue in detail…" required
+            maxlength="2000"></textarea>
+        </div>
+
+        <!-- ML Prediction Preview -->
+        <div id="mlPreview" class="ml-preview hidden">
+          <div class="ml-preview-header">
+            <i class="fas fa-robot"></i>
+            <strong>AI Analysis</strong>
+          </div>
+          <div class="ml-preview-body">
+            <span>Suggested Category: <strong id="mlCatSug"></strong></span>
+            <span>Suggested Priority: <strong id="mlPriSug"></strong></span>
+            <span>Confidence: <strong id="mlConf"></strong></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-map-pin"></i> Location on Map *</label>
+          <p class="hint">Click on the map below to pin the exact location</p>
+          <div id="reportMap"></div>
+          <div class="coords-display">
+            <span>Lat: <strong id="rLat">--</strong></span>
+            <span>Lng: <strong id="rLng">--</strong></span>
+            <input type="hidden" id="rLatInput" />
+            <input type="hidden" id="rLngInput" />
+          </div>
+          <div class="form-group">
+            <label>Location Name / Description</label>
+            <input type="text" id="rLocationName" placeholder="e.g. Library second floor bathroom" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-camera"></i> Photo (optional)</label>
+          <div class="file-upload" id="fileUploadArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Drag & drop or click to upload</span>
+            <input type="file" id="rImage" accept="image/*" />
+          </div>
+          <img id="imagePreview" class="img-preview hidden" alt="Preview" />
+        </div>
+
+        <div class="form-group form-check">
+          <input type="checkbox" id="rAnonymous" />
+          <label for="rAnonymous">Submit anonymously</label>
+        </div>
+
+        <div id="reportError" class="form-error hidden"></div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="cancelReport">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submitReportBtn">
+            <i class="fas fa-paper-plane"></i> Submit Alert
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+     ALERT DETAIL MODAL
+══════════════════════════════════════════════════════════════ -->
+  <div id="alertDetailModal" class="modal-overlay">
+    <div class="modal-box detail-box">
+      <div class="modal-header">
+        <h2 id="detailTitle">Alert Details</h2>
+        <button class="modal-close" id="closeDetail">&times;</button>
+      </div>
+      <div id="detailImage" class="alert-detail-image hidden">
+        <img id="detailImageImg" alt="Alert photo" style="max-width:100%; border-radius:8px; margin-bottom:16px;">
+      </div>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div id="spinner" class="spinner-overlay hidden">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Supabase CDN (UMD build – exposes global `supabase` namespace) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- Initialises window.supabaseClient using the config below -->
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/alerts.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>
